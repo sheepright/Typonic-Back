@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface RankingRepository extends JpaRepository <Ranking, Long> {
   long countByWpmGreaterThan(double wpm);
   long count();
-  List<Ranking> findTop50ByOrderByWpmDescAccuracyDes();
+  List<Ranking> findTop50ByOrderByWpmDescAccuracyDesc();
   Optional<Ranking> findByEmail(String email);
 }

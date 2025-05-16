@@ -49,7 +49,7 @@ public class RankingService {
   }
 
   public List<Ranking> getTop50() {
-    return repository.findTop50ByOrderByWpmDescAccuracyDes();
+    return repository.findTop50ByOrderByWpmDescAccuracyDesc();
   }
 
   public Ranking findByEmail(String email) {
