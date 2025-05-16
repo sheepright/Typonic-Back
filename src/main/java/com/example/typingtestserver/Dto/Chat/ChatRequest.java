@@ -1,4 +1,4 @@
-package com.example.typingtestserver.Dto;
+package com.example.typingtestserver.Dto.Chat;
 
 import lombok.Data;
 
