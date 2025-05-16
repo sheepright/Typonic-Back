@@ -1,9 +1,9 @@
 package com.example.typingtestserver.Controller;
 
-import com.example.typingtestserver.Dto.CodeRequestDto;
-import com.example.typingtestserver.Dto.SentenceKeywordRequestDto;
-import com.example.typingtestserver.Dto.WordKeywordRequestDto;
-import com.example.typingtestserver.Dto.WordRequestDto;
+import com.example.typingtestserver.Dto.Chat.CodeRequestDto;
+import com.example.typingtestserver.Dto.Chat.SentenceKeywordRequestDto;
+import com.example.typingtestserver.Dto.Chat.WordKeywordRequestDto;
+import com.example.typingtestserver.Dto.Chat.WordRequestDto;
 import com.example.typingtestserver.Service.Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;

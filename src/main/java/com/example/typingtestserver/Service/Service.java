@@ -1,6 +1,6 @@
 package com.example.typingtestserver.Service;
 
-import com.example.typingtestserver.Dto.*;
+import com.example.typingtestserver.Dto.Chat.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
