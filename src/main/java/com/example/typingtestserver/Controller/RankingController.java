@@ -4,37 +4,52 @@ import com.example.typingtestserver.Dto.Ranking.RankingRequestDto;
 import com.example.typingtestserver.Dto.Ranking.EmailCheckDto;
 import com.example.typingtestserver.Entity.Ranking;
 import com.example.typingtestserver.Service.RankingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "DB API", description = "랭킹 등록 및 조회 등과 같은 DB 연결 API")
 @RestController
-@RequestMapping("/api/rankings")
+@RequestMapping("/db")
 public class RankingController {
     @Autowired
     private RankingService service;
 
-    //데이터들을 DB에 저장 (존재시 email 빼고 업데이트)
-    @PostMapping
+    @Operation(
+            summary = "DB에 사용자 정보 업로드",
+            description = "DB에 사용자의 이름,이메일 등 정보를 입력하거나 업데이트하는 API"
+    )
+    @PostMapping("/ranking")
     public ResponseEntity<?> createRanking(@RequestBody RankingRequestDto dto){
         return ResponseEntity.ok(service.saveRanking(dto));
     }
 
-    //wpm을 파라미터로 입력하면 DB에서 입력된 wpm은 상위 몇퍼센트인지 조회
+    @Operation(
+            summary = "상위 등급표시",
+            description = "타자 결과 화면에 내 결과의 wpm 이 상위 몇 퍼센트인지 알려주는 API"
+    )
     @GetMapping("/percentile")
     public ResponseEntity<Double> getPercentile(@RequestParam double wpm){
         return ResponseEntity.ok(service.getPercentile(wpm));
     }
 
-    //DB에서 top 50위를 조회
+    @Operation(
+            summary = "리더보드 (50명)",
+            description = "랭킹  리더보드에서 상위 50개의 랭킹을 가져와주는 API"
+    )
     @GetMapping("/top50")
     public ResponseEntity<List<Ranking>> getTop50(){
         return ResponseEntity.ok(service.getTop50());
     }
 
-    //이메일을 파라미터로 입력하면 이름과 wpm을 조회
+    @Operation(
+            summary = "E-mail 중복 체크",
+            description = "랭킹 등록 전에 이미 DB에 존재하는 이메일인지 확인해주는 API"
+    )
     @GetMapping("/email")
     public ResponseEntity<?> getRankingByEmail(@RequestParam String email) {
         Ranking ranking = service.findByEmail(email);
