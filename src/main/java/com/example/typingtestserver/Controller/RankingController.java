@@ -7,6 +7,7 @@ import com.example.typingtestserver.Service.RankingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,8 +25,14 @@ public class RankingController {
             description = "DB에 사용자의 이름,이메일 등 정보를 입력하거나 업데이트하는 API"
     )
     @PostMapping("/ranking")
-    public ResponseEntity<?> createRanking(@RequestBody RankingRequestDto dto){
-        return ResponseEntity.ok(service.saveRanking(dto));
+    public ResponseEntity<?> createRanking(@RequestBody RankingRequestDto dto) {
+        try {
+            String result = service.saveRanking(dto);
+            return ResponseEntity.ok(result);
+        } catch (IllegalArgumentException e) {
+            // 이름에 비속어가 포함된 경우
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @Operation(
@@ -33,7 +40,7 @@ public class RankingController {
             description = "타자 결과 화면에 내 결과의 wpm 이 상위 몇 퍼센트인지 알려주는 API"
     )
     @GetMapping("/percentile")
-    public ResponseEntity<Double> getPercentile(@RequestParam double wpm){
+    public ResponseEntity<Double> getPercentile(@RequestParam double wpm) {
         return ResponseEntity.ok(service.getPercentile(wpm));
     }
 
@@ -42,7 +49,7 @@ public class RankingController {
             description = "랭킹  리더보드에서 상위 50개의 랭킹을 가져와주는 API"
     )
     @GetMapping("/top50")
-    public ResponseEntity<List<Ranking>> getTop50(){
+    public ResponseEntity<List<Ranking>> getTop50() {
         return ResponseEntity.ok(service.getTop50());
     }
 
