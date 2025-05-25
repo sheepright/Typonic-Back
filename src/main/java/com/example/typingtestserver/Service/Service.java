@@ -32,6 +32,8 @@ public class Service {
         ChatRequest request = new ChatRequest();
         request.setModel(model);
         request.setMessages(List.of(message));
+        request.setTemperature(0.8);
+        request.setN(1);
         return request;
     }
 
@@ -56,32 +58,59 @@ public class Service {
     // ✅ 코드 예제 생성
     public String codeExample(CodeRequestDto dto) {
         String prompt = String.format(
-                "%s 언어로 %s 길이의 코드 예제를 작성해줘. 코드만 표시해주고 설명은 생략해줘. " +
-                        "여기서 short, middle, long 는 변수명이나 등이 아니라 길이를 말하는거야",
-                dto.getLanguage(), dto.getLength());
+                "%s 언어로 %s 길이의 코드 예제를 만들어줘. 코드는 완전한 형태로 제공하고, 주석은 포함하지 말아줘. " +
+                        "항상 새로운 예제를 만들어줘서 같은 요청이라도 서로 다른 코드를 생성할 수 있도록 해줘. 설명은 생략하고 코드만 줘.",
+                dto.getLanguage(), dto.getLength()
+        );
         return extractTextContent(sendRequest(prompt));
     }
 
     // ✅ 키워드 기반 연관 문장 생성
     public String sentenceKeyword(SentenceKeywordRequestDto dto) {
-        String prompt = String.format("%s와 연관된 적당한 길이의 문장 하나 작성해줘.", dto.getKeyword());
+        String prompt = String.format(
+                "\"%s\"와 관련된 짧고 명확한 문장을 한 문장만 만들어줘. 항상 새로운 표현을 사용해서 매번 다르게 생성해줘.",
+                dto.getKeyword()
+        );
         return extractTextContent(sendRequest(prompt));
     }
 
     // ✅ 프로그래밍 단어 리스트 생성
     public List<String> codeWords(WordRequestDto dto) {
         String prompt = String.format(
-                "%s 언어에서 자주 쓰이는 프로그래밍 단어를 %d개 콤마로 구분해서 출력해줘. 예: int, class, return...",
-                dto.getLanguage(), dto.getCount());
+                "%s 언어에서 많이 쓰이는 프로그래밍 키워드나 함수명을 %d개 알려줘. " +
+                        "중복 없이 다양하게 골라주고, 콤마로 구분해서 출력해줘. 매 요청마다 가능한 다른 단어들을 선택해줘.",
+                dto.getLanguage(), dto.getCount()
+        );
         return extractWordList(sendRequest(prompt));
     }
 
     // ✅ 키워드 기반 연관 단어 리스트 생성
     public List<String> wordKeyword(WordKeywordRequestDto dto) {
         String prompt = String.format(
-                "%s와 연관된 단어들을 %d개 콤마로 구분해서 출력해줘. 예: 노래 → 가사, 음표, 가수...",
-                dto.getKeyword(), dto.getCount());
+                "\"%s\"와 관련된 단어들을 %d개 골라서 콤마로 구분해줘. 일반적인 단어뿐만 아니라 연상되는 단어들도 포함해서 다양하게 구성해줘.",
+                dto.getKeyword(), dto.getCount()
+        );
         return extractWordList(sendRequest(prompt));
+    }
+
+    // ✅ 사용자 문장을 사용하기 편리하게 변환
+    public String copyData(CopyRequestDto dto) {
+        String prompt = String.format(
+                """
+                다음 문장을 HTML의 아래 CSS 영역 안에 자연스럽게 출력될 수 있도록 예쁘게 다듬어줘.
+                다듬어진 결과는 문장만 출력하고, HTML 태그나 설명은 포함하지 마.
+                너무 길면 읽기 좋게 문장을 나누되 자연스럽게 이어지도록 해줘.
+        
+                CSS:
+                <div className="w-[900px] h-auto bg-cdark rounded-br-[5px] rounded-bl-[5px] pb-[10px] shadow-lg">
+        
+                문장:
+                %s
+                """,
+                dto.getCopyData()
+        );
+
+        return extractTextContent(sendRequest(prompt));
     }
 
     // ✅ 응답 텍스트 추출 메서드 (단일 문자열용)

@@ -1,9 +1,6 @@
 package com.example.typingtestserver.Controller;
 
-import com.example.typingtestserver.Dto.Chat.CodeRequestDto;
-import com.example.typingtestserver.Dto.Chat.SentenceKeywordRequestDto;
-import com.example.typingtestserver.Dto.Chat.WordKeywordRequestDto;
-import com.example.typingtestserver.Dto.Chat.WordRequestDto;
+import com.example.typingtestserver.Dto.Chat.*;
 import com.example.typingtestserver.Service.Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,5 +52,14 @@ public class Controller {
     @PostMapping("/sentenceKeyword")
     public ResponseEntity<String> generateSentenceKeyword(@RequestBody SentenceKeywordRequestDto dto) {
         return ResponseEntity.ok(service.sentenceKeyword(dto));
+    }
+
+    @Operation(
+            summary = "복.붙 양식 변경",
+            description = "사용자가 입력한 양식(문장)을 TYPONIC 양식(문장)으로 변환시켜 전달"
+    )
+    @PostMapping("/copy")
+    public ResponseEntity<String> convertText(@RequestBody CopyRequestDto dto) {
+        return ResponseEntity.ok(service.copyData(dto));
     }
 }
