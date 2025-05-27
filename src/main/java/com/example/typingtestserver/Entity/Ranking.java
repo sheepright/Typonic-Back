@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Schema(description = "랭킹 정보 DTO")
 @Entity
 @Table(name = "RankingTable")
@@ -35,6 +37,6 @@ public class Ranking {
     private int totalCharacters;
     @Schema(description = "정확도 (실수)", example = "99.4")
     private double accuracy;
-
-
+    @Schema(description = "DB등록 시간", example = "2025-05-27T14:30:00")
+    private LocalDateTime date;
 }

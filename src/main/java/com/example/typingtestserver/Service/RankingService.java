@@ -68,6 +68,7 @@ public class RankingService {
         ranking.setTier(dto.getTier());
         ranking.setTotalCharacters(dto.getTotalCharacters());
         ranking.setAccuracy(dto.getAccuracy());
+        ranking.setDate(dto.getDate());
 
         repository.save(ranking);
         return message;
