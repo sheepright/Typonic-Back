@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -68,6 +69,7 @@ public class RankingService {
         ranking.setTier(dto.getTier());
         ranking.setTotalCharacters(dto.getTotalCharacters());
         ranking.setAccuracy(dto.getAccuracy());
+        ranking.setDate(LocalDateTime.now());
 
         repository.save(ranking);
         return message;

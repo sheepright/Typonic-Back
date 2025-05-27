@@ -27,6 +27,5 @@ public class RankingRequestDto {
     private int totalCharacters;
     @Schema(description = "정확도 (실수)", example = "99.4")
     private double accuracy;
-
 }
 
