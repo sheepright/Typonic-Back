@@ -4,11 +4,17 @@ import com.example.typingtestserver.Dto.Chat.*;
 import com.example.typingtestserver.Entity.OpenAi;
 import com.example.typingtestserver.Repository.ChatRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.tika.Tika;
+import org.apache.tika.exception.TikaException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,6 +31,12 @@ public class Service {
 
     private final RestTemplate restTemplate;
     private final ChatRepository chatRepository;
+    private final Tika tika = new Tika();
+    private static final Logger logger = LoggerFactory.getLogger(Service.class);
+
+    private String extractText(MultipartFile file) throws IOException, TikaException {
+        return tika.parseToString(file.getInputStream());
+    }
 
     private String API_URL = "https://api.openai.com/v1/chat/completions";
 
@@ -123,22 +135,44 @@ public class Service {
 
     // ✅ 사용자 문장을 사용하기 편리하게 변환
     public String copyData(CopyRequestDto dto) {
-        String prompt = String.format(
+        String prompt = copyDataPrompt(dto.getCopyData());
+        return extractTextContent(sendRequest(prompt));
+    }
+
+    // ✅ 파일 문자열로 추출
+    public String fileExtractService(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new IllegalArgumentException("파일이 비어 있습니다.");
+        }
+        try {
+            String extractedText = extractText(file);
+            String prompt = copyDataPrompt(extractedText);
+
+            return extractTextContent(sendRequest(prompt));
+
+        } catch (IOException | TikaException e) {
+            logger.error("파일 처리 중 오류 발생: {}", e.getMessage(), e);
+
+            throw new RuntimeException("파일 처리 실패: " + e.getMessage());
+        }
+    }
+
+    // ✅ 중복되는 프롬프트 설정
+    private String copyDataPrompt(String sentence) {
+        return String.format(
                 """
                         다음 문장을 HTML의 아래 CSS 영역 안에 자연스럽게 출력될 수 있도록 예쁘게 다듬어줘.
                         다듬어진 결과는 문장만 출력하고, HTML 태그나 설명은 포함하지 마.
                         너무 길면 읽기 좋게 문장을 나누되 자연스럽게 이어지도록 해줘.
-                                
+    
                         CSS:
                         <div className="w-[900px] h-auto bg-cdark rounded-br-[5px] rounded-bl-[5px] pb-[10px] shadow-lg">
-                                
+    
                         문장:
                         %s
                         """,
-                dto.getCopyData()
+                sentence
         );
-
-        return extractTextContent(sendRequest(prompt));
     }
 
     // ✅ 응답 텍스트 추출 메서드 (단일 문자열용)

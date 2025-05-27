@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -61,5 +62,13 @@ public class Controller {
     @PostMapping("/copy")
     public ResponseEntity<String> convertText(@RequestBody CopyRequestDto dto) {
         return ResponseEntity.ok(service.copyData(dto));
+    }
+    @Operation(
+            summary = "사용자 파일첨부",
+            description = "사용자에게 파일을 첨부받아서 문자열 추출 후 양식 변경시켜 전달"
+    )
+    @PostMapping("/extract")
+    public ResponseEntity<String> extractText(@RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(service.fileExtractService(file));
     }
 }
