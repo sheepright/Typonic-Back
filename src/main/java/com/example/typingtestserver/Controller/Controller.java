@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "GPT API", description = "코드, 단어, 키워드 등의 타이핑 예제 표시해주는 API")
+@Tag(name = "OpenAi API", description = "코드, 단어, 키워드 등의 타이핑 예제 표시해주는 API")
 @RestController
 @RequestMapping("/gpt")
 @RequiredArgsConstructor
