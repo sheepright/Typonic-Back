@@ -1,7 +1,6 @@
 package com.example.typingtestserver.Controller;
 
 import com.example.typingtestserver.Dto.Ranking.RankingRequestDto;
-import com.example.typingtestserver.Dto.Ranking.EmailCheckDto;
 import com.example.typingtestserver.Entity.Ranking;
 import com.example.typingtestserver.Service.RankingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -57,12 +56,8 @@ public class RankingController {
             description = "랭킹 등록 전에 이미 DB에 존재하는 이메일인지 확인해주는 API"
     )
     @GetMapping("/email")
-    public ResponseEntity<?> getRankingByEmail(@RequestParam String email) {
-        Ranking ranking = service.findByEmail(email);
-        if (ranking != null) {
-            return ResponseEntity.ok(new EmailCheckDto(ranking.getName(), ranking.getWpm()));
-        } else {
-            return ResponseEntity.status(404).body("DB에 해당 이메일이 없습니다.");
-        }
+    public ResponseEntity<Boolean> checkEmailExists(@RequestParam String email) {
+        boolean exists = service.checkEmailExists(email);
+        return ResponseEntity.ok(exists);
     }
 }

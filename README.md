@@ -4,9 +4,11 @@
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?logo=mysql&logoColor=white&style=flat)](https://www.mysql.com/)
 [![OpenAI API](https://img.shields.io/badge/OpenAI-API-blue?logo=openai&logoColor=white&style=flat)](https://platform.openai.com/)
 [![Swagger](https://img.shields.io/badge/Swagger-API-yellow?logo=swagger&logoColor=black&style=flat)](https://swagger.io/)
-[![Azure](https://img.shields.io/badge/Azure-Cloud-blue?style=flat)](https://azure.microsoft.com/)
+[![GCP](https://img.shields.io/badge/GCP-Google_Cloud-blue?logo=googlecloud&logoColor=white&style=flat)](https://cloud.google.com/)
 
 ### [➡️ GitHub_FrontPage](https://github.com/sheepright/Typonic-Front)
+
+### [➡️ TYPONIC Service](https://typonic.co.kr/)
 
 ## 🚢 다양한 컨텐츠의 타자연습 사이트
 - `C+, C#, Java, Python, JavaScript 등`의 다양한 언어의 코드 연습 및 단어 연습 제공.

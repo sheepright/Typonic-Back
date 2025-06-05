@@ -6,6 +6,7 @@ import com.example.typingtestserver.Repository.RankingRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class RankingService {
 
@@ -88,7 +90,7 @@ public class RankingService {
     }
 
     // 이메일로 랭킹 조회
-    public Ranking findByEmail(String email) {
-        return repository.findByEmail(email).orElse(null);
+    public boolean checkEmailExists(String email) {
+        return repository.findByEmail(email).isPresent();
     }
 }
