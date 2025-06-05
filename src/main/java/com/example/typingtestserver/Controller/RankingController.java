@@ -24,13 +24,8 @@ public class RankingController {
     )
     @PostMapping("/ranking")
     public ResponseEntity<?> createRanking(@RequestBody RankingRequestDto dto) {
-        try {
-            String result = service.saveRanking(dto);
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            // 이름에 비속어가 포함된 경우
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        String result = service.saveRanking(dto);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(

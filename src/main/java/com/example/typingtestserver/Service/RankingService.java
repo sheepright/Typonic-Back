@@ -3,6 +3,8 @@ package com.example.typingtestserver.Service;
 import com.example.typingtestserver.Dto.Ranking.RankingRequestDto;
 import com.example.typingtestserver.Entity.Ranking;
 import com.example.typingtestserver.Repository.RankingRepository;
+import com.example.typingtestserver.exception.InvalidEmailFormatException;
+import com.example.typingtestserver.exception.ProfanityException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -15,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -48,7 +51,7 @@ public class RankingService {
     // 랭킹 저장
     public String saveRanking(RankingRequestDto dto) {
         if (containsProfanity(dto.getName())) {
-            throw new IllegalArgumentException("비속어 등의 부적절한 단어를 포함할 수 없습니다.");
+            throw new ProfanityException("비속어 등의 부적절한 단어를 포함할 수 없습니다.");
         }
 
         Optional<Ranking> existing = repository.findByEmail(dto.getEmail());
@@ -71,6 +74,7 @@ public class RankingService {
         ranking.setTier(dto.getTier());
         ranking.setTotalCharacters(dto.getTotalCharacters());
         ranking.setAccuracy(dto.getAccuracy());
+        ranking.setClassification(dto.getClassification());
         ranking.setDate(LocalDateTime.now());
 
         repository.save(ranking);
@@ -91,6 +95,12 @@ public class RankingService {
 
     // 이메일로 랭킹 조회
     public boolean checkEmailExists(String email) {
+        String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
+
+        if (!Pattern.matches(emailRegex, email)) {
+            throw new InvalidEmailFormatException("이메일 형식이 올바르지 않습니다.");
+        }
+
         return repository.findByEmail(email).isPresent();
     }
 }

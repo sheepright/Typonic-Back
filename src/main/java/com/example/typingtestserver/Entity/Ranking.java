@@ -39,5 +39,6 @@ public class Ranking {
     private double accuracy;
     @Schema(description = "DB 등록 시간", example = "2025-05-27T14:30:00")
     private LocalDateTime date;
-
+    @Schema(description = "문장과 단어 구별", example = "0 or 1")
+    private int classification;
 }
