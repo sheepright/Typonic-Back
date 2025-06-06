@@ -16,4 +16,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleProfanity(ProfanityException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(1002, ex.getMessage()));
     }
+
+    @ExceptionHandler(InvalidNameLengthException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidNameLength(InvalidNameLengthException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(1003, ex.getMessage()));
+    }
 }

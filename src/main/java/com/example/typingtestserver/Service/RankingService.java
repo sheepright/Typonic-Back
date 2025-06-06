@@ -4,6 +4,7 @@ import com.example.typingtestserver.Dto.Ranking.RankingRequestDto;
 import com.example.typingtestserver.Entity.Ranking;
 import com.example.typingtestserver.Repository.RankingRepository;
 import com.example.typingtestserver.exception.InvalidEmailFormatException;
+import com.example.typingtestserver.exception.InvalidNameLengthException;
 import com.example.typingtestserver.exception.ProfanityException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -50,8 +51,16 @@ public class RankingService {
 
     // 랭킹 저장
     public String saveRanking(RankingRequestDto dto) {
-        if (containsProfanity(dto.getName())) {
+        String name = dto.getName();
+
+        // 비속어 필터링
+        if (containsProfanity(name)) {
             throw new ProfanityException("비속어 등의 부적절한 단어를 포함할 수 없습니다.");
+        }
+
+        // 이름 길이 제한 (띄어쓰기 포함 8자 이하)
+        if (name != null && name.trim().length() > 8) {
+            throw new InvalidNameLengthException("이름은 최대 8자까지 입력할 수 있습니다. (띄어쓰기 포함)");
         }
 
         Optional<Ranking> existing = repository.findByEmail(dto.getEmail());
@@ -67,7 +76,7 @@ public class RankingService {
             message = "새로운 랭킹 저장";
         }
 
-        ranking.setName(dto.getName());
+        ranking.setName(name);
         ranking.setWpm(dto.getWpm());
         ranking.setError(dto.getError());
         ranking.setTime(dto.getTime());
@@ -88,9 +97,14 @@ public class RankingService {
         return ((double) above / total) * 100;
     }
 
-    // 상위 50개 랭킹
-    public List<Ranking> getTop50() {
-        return repository.findTop50ByOrderByWpmDescAccuracyDesc();
+    // 상위 50개 문장 랭킹
+    public List<Ranking> getTop50Sentence() {
+        return repository.findTop50ByClassificationOrderByWpmDescAccuracyDesc(0);
+    }
+
+    // 상위 50개 단어 랭킹
+    public List<Ranking> getTop50Word() {
+        return repository.findTop50ByClassificationOrderByWpmDescAccuracyDesc(1);
     }
 
     // 이메일로 랭킹 조회

@@ -161,10 +161,10 @@ public class Service {
     private String copyDataPrompt(String sentence) {
         return String.format(
                 """
-                        다음 문장을 HTML의 아래 CSS 영역 안에 자연스럽게 출력될 수 있도록 예쁘게 다듬어줘.
+                        다음 문장을 HTML의 아래 CSS 영역 안에서 글의 내용은 그대로 유지하면서, 줄바꿈과 공백만 자연스럽게 정리해줘. 수정하거나 추가하지 마.
                         다듬어진 결과는 문장만 출력하고, HTML 태그나 설명은 포함하지 마.
-                        너무 길면 읽기 좋게 문장을 나누되 자연스럽게 이어지도록 해줘.
-    
+                        영역 안에서 수정할 필요가 없으면 굳이 수정하지 않고 그대로 문장을 도출해도 돼.
+                        
                         CSS:
                         <div className="w-[900px] h-auto bg-cdark rounded-br-[5px] rounded-bl-[5px] pb-[10px] shadow-lg">
     

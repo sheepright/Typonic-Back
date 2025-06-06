@@ -38,12 +38,21 @@ public class RankingController {
     }
 
     @Operation(
-            summary = "리더보드 (50명)",
-            description = "랭킹  리더보드에서 상위 50개의 랭킹을 가져와주는 API"
+            summary = "리더보드 (50명) 문장",
+            description = "문장 랭킹 리더보드에서 상위 50개의 랭킹을 가져와주는 API"
     )
-    @GetMapping("/top50")
-    public ResponseEntity<List<Ranking>> getTop50() {
-        return ResponseEntity.ok(service.getTop50());
+    @GetMapping("/top50/sentence")
+    public ResponseEntity<List<Ranking>> getTop50Sentence() {
+        return ResponseEntity.ok(service.getTop50Sentence());
+    }
+
+    @Operation(
+            summary = "리더보드 (50명) 단어",
+            description = "단어 랭킹 리더보드에서 상위 50개의 랭킹을 가져와주는 API"
+    )
+    @GetMapping("/top50/word")
+    public ResponseEntity<List<Ranking>> getTop50Word() {
+        return ResponseEntity.ok(service.getTop50Word());
     }
 
     @Operation(
