@@ -12,4 +12,5 @@ public interface RankingRepository extends JpaRepository <Ranking, Long> {
     List<Ranking> findTop50ByClassificationOrderByWpmDescAccuracyDesc(int classification);
     Optional<Ranking> findByEmail(String email);
     Optional<Ranking> findByEmailAndClassification(String email, int classification);
+    boolean existsByNameAndClassification(String name, int classification);
 }

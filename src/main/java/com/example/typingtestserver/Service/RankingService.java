@@ -7,6 +7,7 @@ import com.example.typingtestserver.Repository.RankingRepository;
 import com.example.typingtestserver.exception.exception.InvalidEmailFormatException;
 import com.example.typingtestserver.exception.exception.InvalidNameLengthException;
 import com.example.typingtestserver.exception.exception.InvalidRankingValueException;
+import com.example.typingtestserver.exception.exception.InvalidNameException;
 import com.example.typingtestserver.exception.exception.ProfanityException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,22 +62,29 @@ public class RankingService {
             throw new ProfanityException("비속어 등의 부적절한 단어를 포함할 수 없습니다.");
         }
 
-        // 이름 길이 제한 (띄어쓰기 포함 8자 이하)
+        // 이름 길이 제한
         if (name != null && name.trim().length() > 8) {
             throw new InvalidNameLengthException("이름은 최대 8자까지 입력할 수 있습니다. (띄어쓰기 포함)");
         }
 
-        // 단일 예외 메시지
+        String trimmedName = name.trim();
+        Optional<Ranking> existingByEmailAndClass = repository.findByEmailAndClassification(dto.getEmail(), dto.getClassification());
+
+        boolean nameExists = repository.existsByNameAndClassification(trimmedName, dto.getClassification());
+        boolean isDifferentUser = existingByEmailAndClass.isEmpty() || !existingByEmailAndClass.get().getName().equals(trimmedName);
+
+        if (nameExists && isDifferentUser) {
+            throw new InvalidNameException("이미 존재하는 이름입니다. 다른 이름을 입력해주세요.");
+        }
+
         String commonValidationErrorMsg = "정상적인 방식의 시도가 아닙니다.";
 
-        // wpm, time, tier 검사
         if (dto.getWpm() < 0 || dto.getWpm() > 1500 ||
                 dto.getTime() < 0.1 ||
                 dto.getTier() == null || !List.of("뗏목", "낚시배", "요트", "고속보트", "크루즈", "화물선", "군함").contains(dto.getTier())) {
             throw new InvalidRankingValueException(commonValidationErrorMsg);
         }
 
-        // 추가 유효성 검사
         if (dto.getError() < 0 ||
                 dto.getTotalCharacters() < 0 ||
                 dto.getAccuracy() < 0 || dto.getAccuracy() > 100 ||
@@ -84,12 +92,11 @@ public class RankingService {
             throw new InvalidRankingValueException(commonValidationErrorMsg);
         }
 
-        Optional<Ranking> existing = repository.findByEmail(dto.getEmail());
         Ranking ranking;
         String message;
 
-        if (existing.isPresent()) {
-            ranking = existing.get();
+        if (existingByEmailAndClass.isPresent()) {
+            ranking = existingByEmailAndClass.get();
             message = "업데이트 완료";
         } else {
             ranking = new Ranking();
@@ -97,7 +104,7 @@ public class RankingService {
             message = "새로운 랭킹 저장";
         }
 
-        ranking.setName(name);
+        ranking.setName(trimmedName);
         ranking.setWpm(dto.getWpm());
         ranking.setError(dto.getError());
         ranking.setTime(dto.getTime());

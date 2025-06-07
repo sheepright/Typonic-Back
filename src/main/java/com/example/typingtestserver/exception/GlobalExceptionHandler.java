@@ -27,4 +27,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidRankingValue(InvalidRankingValueException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(1004, ex.getMessage()));
     }
+
+    @ExceptionHandler(InvalidNameException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidName(InvalidNameException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(1005, ex.getMessage()));
+    }
 }
