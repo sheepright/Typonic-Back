@@ -1,7 +1,7 @@
 package com.example.typingtestserver.Controller;
 
 import com.example.typingtestserver.Dto.Ranking.RankingRequestDto;
-import com.example.typingtestserver.Entity.Ranking;
+import com.example.typingtestserver.Dto.Ranking.RankingResponseDto;
 import com.example.typingtestserver.Service.RankingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,13 +24,8 @@ public class RankingController {
     )
     @PostMapping("/ranking")
     public ResponseEntity<?> createRanking(@RequestBody RankingRequestDto dto) {
-        try {
-            String result = service.saveRanking(dto);
-            return ResponseEntity.ok(result);
-        } catch (IllegalArgumentException e) {
-            // 이름에 비속어가 포함된 경우
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        String result = service.saveRanking(dto);
+        return ResponseEntity.ok(result);
     }
 
     @Operation(
@@ -43,21 +38,30 @@ public class RankingController {
     }
 
     @Operation(
-            summary = "리더보드 (50명)",
-            description = "랭킹  리더보드에서 상위 50개의 랭킹을 가져와주는 API"
+            summary = "리더보드 (50명) 문장",
+            description = "문장 랭킹 리더보드에서 상위 50개의 랭킹을 가져와주는 API"
     )
-    @GetMapping("/top50")
-    public ResponseEntity<List<Ranking>> getTop50() {
-        return ResponseEntity.ok(service.getTop50());
+    @GetMapping("/top50/sentence")
+    public ResponseEntity<List<RankingResponseDto>> getTopSentence() {
+        return ResponseEntity.ok(service.getTop50Sentence());
     }
 
     @Operation(
-            summary = "E-mail 중복 체크",
+            summary = "리더보드 (50명) 단어",
+            description = "단어 랭킹 리더보드에서 상위 50개의 랭킹을 가져와주는 API"
+    )
+    @GetMapping("/top50/word")
+    public ResponseEntity<List<RankingResponseDto>> getTopWord() {
+        return ResponseEntity.ok(service.getTop50Word());
+    }
+
+    @Operation(
+            summary = "랭킹별 E-mail 중복 체크",
             description = "랭킹 등록 전에 이미 DB에 존재하는 이메일인지 확인해주는 API"
     )
     @GetMapping("/email")
-    public ResponseEntity<Boolean> checkEmailExists(@RequestParam String email) {
-        boolean exists = service.checkEmailExists(email);
+    public ResponseEntity<Boolean> checkEmailExists(@RequestParam String email, @RequestParam int classification) {
+        boolean exists = service.checkEmailExists(email, classification);
         return ResponseEntity.ok(exists);
     }
 }
