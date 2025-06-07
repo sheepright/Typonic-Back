@@ -1,11 +1,13 @@
 package com.example.typingtestserver.Service;
 
 import com.example.typingtestserver.Dto.Ranking.RankingRequestDto;
+import com.example.typingtestserver.Dto.Ranking.RankingResponseDto;
 import com.example.typingtestserver.Entity.Ranking;
 import com.example.typingtestserver.Repository.RankingRepository;
-import com.example.typingtestserver.exception.InvalidEmailFormatException;
-import com.example.typingtestserver.exception.InvalidNameLengthException;
-import com.example.typingtestserver.exception.ProfanityException;
+import com.example.typingtestserver.exception.exception.InvalidEmailFormatException;
+import com.example.typingtestserver.exception.exception.InvalidNameLengthException;
+import com.example.typingtestserver.exception.exception.InvalidRankingValueException;
+import com.example.typingtestserver.exception.exception.ProfanityException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
@@ -36,7 +38,8 @@ public class RankingService {
         try {
             ObjectMapper mapper = new ObjectMapper();
             ClassPathResource resource = new ClassPathResource("badwords.json");
-            bannedWords = mapper.readValue(resource.getInputStream(), new TypeReference<>() {});
+            bannedWords = mapper.readValue(resource.getInputStream(), new TypeReference<>() {
+            });
         } catch (Exception e) {
             throw new RuntimeException("비속어 리스트를 불러오는 데 실패했습니다.", e);
         }
@@ -61,6 +64,24 @@ public class RankingService {
         // 이름 길이 제한 (띄어쓰기 포함 8자 이하)
         if (name != null && name.trim().length() > 8) {
             throw new InvalidNameLengthException("이름은 최대 8자까지 입력할 수 있습니다. (띄어쓰기 포함)");
+        }
+
+        // 단일 예외 메시지
+        String commonValidationErrorMsg = "정상적인 방식의 시도가 아닙니다.";
+
+        // wpm, time, tier 검사
+        if (dto.getWpm() < 0 || dto.getWpm() > 1500 ||
+                dto.getTime() < 0.1 ||
+                dto.getTier() == null || !List.of("뗏목", "낚시배", "요트", "고속보트", "크루즈", "화물선", "군함").contains(dto.getTier())) {
+            throw new InvalidRankingValueException(commonValidationErrorMsg);
+        }
+
+        // 추가 유효성 검사
+        if (dto.getError() < 0 ||
+                dto.getTotalCharacters() < 0 ||
+                dto.getAccuracy() < 0 || dto.getAccuracy() > 100 ||
+                (dto.getClassification() != 0 && dto.getClassification() != 1)) {
+            throw new InvalidRankingValueException(commonValidationErrorMsg);
         }
 
         Optional<Ranking> existing = repository.findByEmail(dto.getEmail());
@@ -97,24 +118,40 @@ public class RankingService {
         return ((double) above / total) * 100;
     }
 
-    // 상위 50개 문장 랭킹
-    public List<Ranking> getTop50Sentence() {
-        return repository.findTop50ByClassificationOrderByWpmDescAccuracyDesc(0);
+    private RankingResponseDto convertToDto(Ranking r) {
+        RankingResponseDto dto = new RankingResponseDto();
+        dto.setName(r.getName());
+        dto.setWpm(r.getWpm());
+        dto.setTime(r.getTime());
+        dto.setAccuracy(r.getAccuracy());
+        dto.setDate(r.getDate());
+        return dto;
     }
 
-    // 상위 50개 단어 랭킹
-    public List<Ranking> getTop50Word() {
-        return repository.findTop50ByClassificationOrderByWpmDescAccuracyDesc(1);
+    // 문장 리더보드
+    public List<RankingResponseDto> getTop50Sentence() {
+        return repository.findTop50ByClassificationOrderByWpmDescAccuracyDesc(0)
+                .stream()
+                .map(this::convertToDto)
+                .toList();
+    }
+
+    // 단어 리더보드
+    public List<RankingResponseDto> getTop50Word() {
+        return repository.findTop50ByClassificationOrderByWpmDescAccuracyDesc(1)
+                .stream()
+                .map(this::convertToDto)
+                .toList();
     }
 
     // 이메일로 랭킹 조회
-    public boolean checkEmailExists(String email) {
+    public boolean checkEmailExists(String email, int classification) {
         String emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$";
 
         if (!Pattern.matches(emailRegex, email)) {
             throw new InvalidEmailFormatException("이메일 형식이 올바르지 않습니다.");
         }
 
-        return repository.findByEmail(email).isPresent();
+        return repository.findByEmailAndClassification(email, classification).isPresent();
     }
 }

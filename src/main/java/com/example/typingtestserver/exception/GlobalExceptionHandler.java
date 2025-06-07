@@ -1,5 +1,6 @@
 package com.example.typingtestserver.exception;
 
+import com.example.typingtestserver.exception.exception.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,5 +21,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidNameLengthException.class)
     public ResponseEntity<ErrorResponse> handleInvalidNameLength(InvalidNameLengthException ex) {
         return ResponseEntity.badRequest().body(new ErrorResponse(1003, ex.getMessage()));
+    }
+
+    @ExceptionHandler(InvalidRankingValueException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRankingValue(InvalidRankingValueException ex) {
+        return ResponseEntity.badRequest().body(new ErrorResponse(1004, ex.getMessage()));
     }
 }
